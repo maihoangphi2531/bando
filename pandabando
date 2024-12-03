@@ -1,0 +1,215 @@
+-- Cấu hình các tùy chọn bán đồ
+getgenv().Common = true
+getgenv().Uncommon = true
+getgenv().Rare = true
+getgenv().Epic = true
+getgenv().Legendary = true
+
+-- Danh sách các giá trị perk và perkvalue cần giữ lại
+local validPerks = {
+        ["UltCharge"] = {min = 0.15, max = 0.15},
+        ["MobBoss"] = {min = 0.30, max = 0.30},
+        ["TestTier5"] = {min = 0.30, max = 0.30},
+        ["BurnChance"] = {min = 0.15, max = 0.15},
+        ["CritStack"] = {min = 0.15, max = 0.15},
+        ["GoldDrop"] = {min = 0.20, max = 0.20},
+        ["MasterThieft"] = {min = 0.35, max = 0.35},
+        ["Glass"] = {min = 1.00, max = 1.00},
+        ["BonusAttack"] = {min = 0.08, max = 0.08},
+        ["BonusWalkspeed"] = {min = 0.15, max = 0.15},
+        ["PetFoodDrop"] = {min = 0.10, max = 0.10},
+        ["DamageReduction"] = {min = 0.08, max = 0.08},
+        ["DodgeChane"] = {min = 0.20, max = 0.20}
+    }
+
+-- Hàm kiểm tra nếu Perk hợp lệ
+local function isValidPerk(perkName, perkValue)
+   
+    if validPerks[perkName] then
+        local validRange = validPerks[perkName]
+        -- Kiểm tra nếu giá trị nằm trong dải min và max
+        if perkValue >= validRange.min and perkValue <= validRange.max then
+            return true
+        end
+    end
+    return false
+end
+
+-- Định nghĩa hàm lấy danh sách đồ
+function getItemList()
+    
+    local itemList = {}
+    local success, items = pcall(function()
+        return require(game:GetService("ReplicatedStorage").Shared.Items)
+    end)
+    if not success then
+        warn("Error loading item list: " .. tostring(items))
+        return itemList
+    end
+
+    for a, b in pairs(items) do
+        for i, v in pairs(b) do
+            if (i == 'Type') and (v == 'Weapon' or v == 'Armor') then
+                table.insert(itemList, b)
+            end
+        end
+    end
+    return itemList
+end
+
+-- Định nghĩa hàm lấy tên đồ
+function getItemName()
+  
+    local itemNameTable = {}
+    local playerName = game.Players.LocalPlayer.Name
+    local playerInventory = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Profile")
+
+    if not playerInventory then
+    warn("Profile không tồn tại trong PlayerGui")
+    return
+    end
+
+
+    -- Chờ đợi profiles tải xong
+    repeat
+        wait(1)
+        playerInventory = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Profile")
+    until playerInventory
+
+    for i, v in ipairs(playerInventory.Inventory.Items:GetChildren()) do
+        if v:FindFirstChild('Level') or v:FindFirstChild('Upgrade') or v:FindFirstChild('UpgradeLimit') then
+            if not string.find(v.Name:lower(), "pet") then
+                table.insert(itemNameTable, v)
+            end
+        end
+    end
+    return itemNameTable
+end
+
+
+-- Hàm để kiểm tra nếu một món đồ có ít nhất 1 Perk hợp lệ
+local function hasValidPerk(item)
+    
+    for _, perkName in ipairs({"Perk1", "Perk2", "Perk3"}) do
+local perk = item:FindFirstChild(perkName)
+        if perk then
+            local perkValue = perk:FindFirstChild("PerkValue")
+            if perkValue then
+                print("Checking perk:", perk.Value, "with value:", perkValue.Value) -- Debug print
+                if isValidPerk(perk.Value, perkValue.Value) then
+                    print("Valid perk found:", perk.Value, "with value:", perkValue.Value) -- Debug print
+                    return true -- Dừng lại và trả về true nếu tìm thấy perk hợp lệ
+                end
+            end
+        end
+    end
+    return false -- Trả về false nếu không có perk nào hợp lệ
+end
+
+
+-- Danh mục vũ khí và giáp
+local categorizedItems = {
+    Staff = {
+        "W10T5Staff", "W9T5Staff", "World8Tier5Staff", "WingsOfDare", "KrakenStaff", "Firecaster", "StaffOfScarabs", "WillOTheWisp", "CerberusStaff", "WickedStaff"
+    },
+    Armor = {
+        "W10T5Armor", "AngelArmor", "DragonKin", "World8Tier5Armor", "W9T5Armor", "NightTerror", "PhoenixPlate", "HolyArmor", "CloakOfEmbers", "WitchHunterArmor"
+    },
+    Greatsword = {
+        "W9T5Greatsword", "World8Tier5Greatsword", "Legacy", "SirensWatch", "VeryHotGreatsword", "WrappedGreatsword", "Permafrost", "Spirebane", "BrassGreatsword", "W10T5Greatsword"
+    },
+    Sword = {
+        "W10T5Longsword", "W9T5Longsword", "World8Tier5Longsword", "GuildedChampion", "Deeptrench", "IgnisTeeth", "Titanslayer", "VoidSlayer", "ThrasherLongsword", "SpireSlayer"
+    },
+    Bow = {
+        "W10T5Bow", "W9T5Bow", "World8Tier5Bow", "GreatBow", "SirensSong", "IgnisDraw", "Royalty", "WintersBite", "Thornmaker", "WickedBow"
+    },
+    Scythe = {
+        "W10T5Scythe", "W9T5Scythe", "World8Tier5Scythe", "GrimDay", "Squidbane", "Ignition", "Sandstorm", "WretchedScythe", "ClawOfWinter", "Meteorfall"
+    }
+}
+
+-- Hàm xác định loại của món đồ
+local function getItemCategory(itemName)
+    for category, items in pairs(categorizedItems) do
+        for _, name in ipairs(items) do
+            if name == itemName then
+                return category
+            end
+        end
+    end
+    return "Unknown" -- Nếu không tìm thấy loại
+end
+
+-- Cập nhật hàm ToSell để in loại của món đồ
+function ToSell()
+    
+    local rarity
+    local itemToSell = {}
+    local itemTypeTable = getItemList()
+    local itemNameTable = getItemName()
+    
+    for _, b in pairs(itemNameTable) do
+        for _, d in pairs(itemTypeTable) do
+            if d.Name == tostring(b) then
+                rarity = d.Rarity
+                local category = getItemCategory(d.Name)
+                print("Checking item:", d.Name, "with rarity:", rarity, "and category:", category) -- Debug print
+
+                -- Xử lý theo từng độ hiếm
+                if rarity == 1 and getgenv().Common then
+                    table.insert(itemToSell, b)
+                elseif rarity == 2 and getgenv().Uncommon then
+table.insert(itemToSell, b)
+                elseif rarity == 3 and getgenv().Rare then
+                    table.insert(itemToSell, b)
+                elseif rarity == 4 and getgenv().Epic then
+                    table.insert(itemToSell, b)
+                elseif rarity == 5 and getgenv().Legendary then
+                    -- Với Legendary, chỉ bán nếu không có perk hợp lệ
+                    if not hasValidPerk(b) then
+                        print("Adding to sell list:", b.Name, "- No valid perks found") -- Debug print
+                        table.insert(itemToSell, b)
+                    else
+                        print("Skipping item:", b.Name, "- Has valid perks") -- Debug print
+                    end
+                end
+            end
+        end
+    end
+    
+    return itemToSell
+end
+
+
+
+-- Định nghĩa hàm bán đồ
+function SellItem()
+    
+    local itemToSell = ToSell()
+    if #itemToSell > 0 then
+        print("Selling items: " .. #itemToSell) -- Debug print
+        for _, item in ipairs(itemToSell) do
+            print("Selling item: " .. item.Name) -- Debug print
+        end
+        local success, result = pcall(function()
+            return game:GetService("ReplicatedStorage").Shared.Drops.SellItems:InvokeServer(itemToSell)
+        end)
+        if not success then
+            warn("Failed to sell items: " .. tostring(result))
+        end
+    else
+        print("No items to sell") -- Debug print
+    end
+end
+
+-- Định nghĩa hàm chạy bán đồ liên tục
+function ContinuousSellItem()
+    while true do
+        SellItem()
+        wait(10) -- Điều chỉnh thời gian chờ nếu cần thiết
+    end
+end
+
+-- Bắt đầu coroutine để chạy bán đồ liên tục
+task.spawn(ContinuousSellItem)
