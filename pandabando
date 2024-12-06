@@ -1,3 +1,4 @@
+wait(10)
 -- Cấu hình các tùy chọn bán đồ
 getgenv().Common = true
 getgenv().Uncommon = true
