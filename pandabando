@@ -1,4 +1,4 @@
-wait(20)
+wait(40)
 -- Cấu hình các tùy chọn bán đồ
 getgenv().Common = true
 getgenv().Uncommon = true
@@ -208,7 +208,7 @@ end
 function ContinuousSellItem()
     while true do
         SellItem()
-        wait(10) -- Điều chỉnh thời gian chờ nếu cần thiết
+        wait(5) -- Điều chỉnh thời gian chờ nếu cần thiết
     end
 end
 
