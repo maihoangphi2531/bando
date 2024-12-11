@@ -14,12 +14,12 @@ local validPerks = {
         ["BurnChance"] = {min = 0.55, max = 0.55},
         ["CritStack"] = {min = 0.55, max = 0.55},
         ["GoldDrop"] = {min = 0.50, max = 0.50},
-        ["MasterThieft"] = {min = 0.55, max = 0.55},
+        ["MasterThieft"] = {min = 0.35, max = 0.35},
         ["Glass"] = {min = 1.00, max = 1.00},
         ["BonusAttack"] = {min = 0.58, max = 0.58},
-        ["BonusWalkspeed"] = {min = 0.55, max = 0.55},
+        ["BonusWalkspeed"] = {min = 0.10, max = 0.10},
         ["PetFoodDrop"] = {min = 0.50, max = 0.50},
-        ["DamageReduction"] = {min = 0.08, max = 0.08},
+        ["DamageReduction"] = {min = 0.10, max = 0.10},
         ["DodgeChane"] = {min = 0.20, max = 0.20}
     }
 
