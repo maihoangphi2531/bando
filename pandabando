@@ -13,7 +13,7 @@ local validPerks = {
         ["TestTier5"] = {min = 0.50, max = 0.50},
         ["BurnChance"] = {min = 0.115, max = 0.115},
         ["CritStack"] = {min = 0.155, max = 0.155},
-        ["GoldDrop"] = {min = 0.19, max = 0.20},
+        ["GoldDrop"] = {min = 0.2, max = 0.2},
         ["MasterThieft"] = {min = 0.135, max = 0.315},
         ["Glass"] = {min = 11.00, max = 11.00},
         ["BonusAttack"] = {min = 0.18, max = 0.18},
